@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export function ChordLane() {
-  // ✅ derive current section from state
   const section = useSongsStore((s) => {
     const song = s.songs.find((x) => x.id === s.selectedSongId);
     if (!song) return undefined;
@@ -25,11 +24,11 @@ export function ChordLane() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2">
         {section.chords.map((c) => (
           <div
             key={c.id}
-            className="flex items-center gap-2 rounded-xl border px-3 py-2"
+            className="flex items-center gap-3 rounded-xl border px-3 py-2"
           >
             <div
               className={`size-2 rounded-full ${
@@ -44,11 +43,13 @@ export function ChordLane() {
                 {c.romanNumeral}
               </div>
             </div>
-            <Badge variant="outline">{c.harmonicFunction?.[0] ?? ""}</Badge>
-            <div className="text-xs text-muted-foreground">
-              {c.duration} beats
-            </div>
-            <div className="ml-2 flex items-center gap-1">
+            {c.harmonicFunction && (
+              <Badge variant="outline" className="uppercase">
+                {c.harmonicFunction[0]}
+              </Badge>
+            )}
+            <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{c.duration} beats</span>
               <Button
                 size="sm"
                 variant="secondary"
@@ -56,12 +57,14 @@ export function ChordLane() {
                   updateChordDuration(c.id, Math.max(1, c.duration - 1))
                 }
               >
-                –
+                −
               </Button>
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => updateChordDuration(c.id, c.duration + 1)}
+                onClick={() =>
+                  updateChordDuration(c.id, Math.min(16, c.duration + 1))
+                }
               >
                 +
               </Button>

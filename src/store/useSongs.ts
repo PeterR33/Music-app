@@ -247,63 +247,81 @@ export const useSongsStore = create<SongsState>()(
           });
           return { songs };
         }),
-      removeChord: (id) =>
+      removeChord: (chordId: string) =>
         set((state) => {
-          const song = get().selectedSong;
-          if (!song) return state;
-          return {
-            songs: state.songs.map((sn) =>
-              sn.id === song.id
-                ? {
-                    ...sn,
-                    sections: sn.sections.map((sec) => ({
-                      ...sec,
-                      chords: sec.chords.filter((c) => c.id !== id),
-                    })),
-                  }
-                : sn
-            ),
-          };
+          const song = state.songs.find((x) => x.id === state.selectedSongId);
+          if (!song || !song.selectedSectionId) return state;
+          const sid = song.selectedSectionId;
+
+          const songs = state.songs.map((sn) =>
+            sn.id !== song.id
+              ? sn
+              : {
+                  ...sn,
+                  sections: sn.sections.map((sec) =>
+                    sec.id !== sid
+                      ? sec
+                      : {
+                          ...sec,
+                          chords: sec.chords.filter((c) => c.id !== chordId),
+                        }
+                  ),
+                }
+          );
+          return { songs };
         }),
-      duplicateChord: (id) =>
+      duplicateChord: (chordId: string) =>
         set((state) => {
-          const song = get().selectedSong;
-          if (!song) return state;
-          return {
-            songs: state.songs.map((sn) =>
-              sn.id === song.id
-                ? {
-                    ...sn,
-                    sections: sn.sections.map((sec) => ({
-                      ...sec,
-                      chords: sec.chords.flatMap((c) =>
-                        c.id === id ? [c, { ...c, id: nanoid() }] : [c]
-                      ),
-                    })),
-                  }
-                : sn
-            ),
-          };
+          const song = state.songs.find((x) => x.id === state.selectedSongId);
+          if (!song || !song.selectedSectionId) return state;
+          const sid = song.selectedSectionId;
+
+          const songs = state.songs.map((sn) => {
+            if (sn.id !== song.id) return sn;
+            return {
+              ...sn,
+              sections: sn.sections.map((sec) => {
+                if (sec.id !== sid) return sec;
+                const idx = sec.chords.findIndex((c) => c.id === chordId);
+                if (idx === -1) return sec;
+                const copy = { ...sec.chords[idx], id: crypto.randomUUID() };
+                const next = [...sec.chords];
+                next.splice(idx + 1, 0, copy);
+                return { ...sec, chords: next };
+              }),
+            };
+          });
+          return { songs };
         }),
-      updateChordDuration: (id, beats) =>
+      updateChordDuration: (chordId: string, beats: number) =>
         set((state) => {
-          const song = get().selectedSong;
-          if (!song) return state;
-          return {
-            songs: state.songs.map((sn) =>
-              sn.id === song.id
-                ? {
-                    ...sn,
-                    sections: sn.sections.map((sec) => ({
-                      ...sec,
-                      chords: sec.chords.map((c) =>
-                        c.id === id ? { ...c, duration: beats } : c
-                      ),
-                    })),
-                  }
-                : sn
-            ),
-          };
+          const song = state.songs.find((x) => x.id === state.selectedSongId);
+          if (!song || !song.selectedSectionId) return state;
+          const sid = song.selectedSectionId;
+
+          const songs = state.songs.map((sn) =>
+            sn.id !== song.id
+              ? sn
+              : {
+                  ...sn,
+                  sections: sn.sections.map((sec) =>
+                    sec.id !== sid
+                      ? sec
+                      : {
+                          ...sec,
+                          chords: sec.chords.map((c) =>
+                            c.id === chordId
+                              ? {
+                                  ...c,
+                                  duration: Math.max(1, Math.min(16, beats)),
+                                }
+                              : c
+                          ),
+                        }
+                  ),
+                }
+          );
+          return { songs };
         }),
     }),
     { name: "songbuilder-store" }

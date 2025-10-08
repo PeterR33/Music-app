@@ -1,16 +1,13 @@
-// src/components/SuggestionGrid.tsx
 "use client";
 import useSWR from "swr";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useSongsStore } from "@/store/useSongs";
 import type { Suggestion } from "@/types/music";
 
 const fetcher = (u: string) => fetch(u).then((r) => r.json());
 
 export function SuggestionGrid() {
-  // ✅ derive from state, not getter
   const song = useSongsStore((s) =>
     s.songs.find((x) => x.id === s.selectedSongId)
   );
@@ -24,7 +21,7 @@ export function SuggestionGrid() {
   if (!song) return null;
 
   return (
-    <div className="rounded-2xl p-3">
+    <div className="rounded-2xl">
       <div className="mb-3">
         <h3 className="text-sm font-semibold">Outside-the-Key Suggestions</h3>
         <p className="text-xs text-muted-foreground">
@@ -32,7 +29,6 @@ export function SuggestionGrid() {
         </p>
       </div>
 
-      {/* use auto-fit to flow nicely; make each item a block “card” */}
       <div
         className="grid gap-2 sm:gap-3"
         style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}
@@ -42,8 +38,7 @@ export function SuggestionGrid() {
             key={`${sug.romanNumeral}-${sug.chordSymbol}`}
             variant="outline"
             onClick={() => addChordFromSuggestion(sug)}
-            className="block h-auto w-full justify-start whitespace-normal rounded-xl border
-                       p-3 text-left hover:bg-amber-500/10"
+            className="block h-auto w-full justify-start whitespace-normal rounded-xl border p-3 text-left hover:bg-amber-500/10"
           >
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-between">
