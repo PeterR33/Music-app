@@ -1,0 +1,32 @@
+/* Tailwind v4 minimal globals */
+/* app/globals.css */
+@import "tailwindcss";
+
+/* Design tokens (light/dark) */
+:root {
+  --radius: 1rem;
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+}
+
+/* Base element styling without @apply (v4-safe) */
+html,
+body {
+  min-height: 100dvh;
+}
+
+*,
+*::before,
+*::after {
+  border-color: hsl(var(--foreground) / 0.15);
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
