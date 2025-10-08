@@ -207,7 +207,7 @@ export function normalizeKey(k: string) {
     .replace("-", "")
     .toUpperCase() as keyof typeof THEORY_V1.diatonic;
 }
-
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function buildSuggestions(key: string, scale: string) {
   // Minimal educational set – expand later
   const base = [
